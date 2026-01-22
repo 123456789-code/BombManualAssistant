@@ -130,7 +130,10 @@
     <ClCompile Include="Main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="data.h" />
+    <ClInclude Include="maze.h" />
     <ClInclude Include="mytool.h" />
+    <ClInclude Include="win.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="KeepTalkingAndNobodyExplodes-BombDefusalManual-v1-zh-CN.pdf" />

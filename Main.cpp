@@ -1,11 +1,19 @@
-/*Made by Wang125510*/
-
+/*
+ *  oooooo   oooooo     oooo                                    .o    .oooo.     oooooooo   oooooooo   .o    .oooo.
+ *   `888.    `888.     .8'                                   o888  .dP""Y88b   dP"""""""  dP""""""" o888   d8P'`Y8b
+ *    `888.   .8888.   .8'    .oooo.   ooo. .oo.    .oooooooo  888        ]8P' d88888b.   d88888b.    888  888    888
+ *     `888  .8'`888. .8'    `P  )88b  `888P"Y88b  888' `88b   888      .d8P'      `Y88b      `Y88b   888  888    888
+ *      `888.8'  `888.8'      .oP"888   888   888  888   888   888    .dP'           ]88        ]88   888  888    888
+ *       `888'    `888'      d8(  888   888   888  `88bod8P'   888  .oP     .o o.   .88P  o.   .88P   888  `88b  d88'
+ *        `8'      `8'       `Y888""8o o888o o888o `8oooooo.  o888o 8888888888 `8bd88P'   `8bd88P'   o888o  `Y8bd8P'
+ *                                                 d"     YD
+ *                                                 "Y88888P'
+ */
 #include <iostream>
 #include <string>
-#include <algorithm>
-#include <array>
 #include <bitset>
-#include <unordered_map>
+#include <vector>
+#include <algorithm>
 
 #ifdef _WIN32
 #include <thread>
@@ -13,201 +21,53 @@
 #endif
 
 #include "mytool.h"
+#include "data.h";
+#include "win.h";
 
-using std::cin, std::string, std::array, std::fill, std::bitset, std::pair, std::unordered_map, std::thread;
+using std::cin, std::cout, std::endl, std::string, std::fill, std::bitset, std::pair, std::unordered_map, std::thread, std::vector, std::remove_if, std::left, std::setw;
 using mytool::print, mytool::printa, mytool::prints;
 
 #ifdef _DEBUG
 	using mytool::pass;
 #endif // DEBUG
 
-#ifdef _WIN32
-	// 检查当前是否以管理员权限运行
-	BOOL IsRunAsAdmin() {
-		BOOL isAdmin = FALSE;
-		PSID adminGroup = NULL;
-
-		// 创建管理员组的 SID
-		SID_IDENTIFIER_AUTHORITY NtAuthority = SECURITY_NT_AUTHORITY;
-		if (AllocateAndInitializeSid(&NtAuthority, 2,
-			SECURITY_BUILTIN_DOMAIN_RID,
-			DOMAIN_ALIAS_RID_ADMINS,
-			0, 0, 0, 0, 0, 0,
-			&adminGroup)) {
-
-			if (!CheckTokenMembership(NULL, adminGroup, &isAdmin)) {
-				isAdmin = FALSE;
-			}
-
-			FreeSid(adminGroup);
-		}
-
-		return isAdmin;
-	}
-
-	// 请求以管理员权限重新启动程序
-	BOOL RestartAsAdmin() {
-		WCHAR szPath[MAX_PATH];
-		if (GetModuleFileName(NULL, szPath, ARRAYSIZE(szPath))) {
-			SHELLEXECUTEINFO sei = { sizeof(sei) };
-
-			sei.lpVerb = L"runas";  // 请求提升权限的关键
-			sei.lpFile = szPath;
-			sei.hwnd = NULL;
-			sei.nShow = SW_NORMAL;
-
-			if (ShellExecuteEx(&sei)) {
-				return TRUE;
-			}
-			else {
-				DWORD dwError = GetLastError();
-				if (dwError == ERROR_CANCELLED) {
-					// 用户拒绝了 UAC 提示
-					MessageBox(NULL, L"需要管理员权限才能继续操作", L"权限不足", MB_ICONWARNING);
-				}
-				return FALSE;
-			}
-		}
-		return FALSE;
-	}
-#endif
-
-
-
-// 模块4
-const unsigned table4[2][3][4] = {
-	{ {4,3,2,1}, {1,4,3,2}, {3,2,4,1} },
-	{ {4,1,3,2}, {3,2,4,1}, {2,1,3,4} }
-};
-// 模块7
-const unordered_map<string, char> morse_to_char = {
-	{"01", 'a'},      // .-
-	{"1000", 'b'},    // -...
-	{"1010", 'c'},    // -.-.
-	{"100", 'd'},     // -..
-	{"0", 'e'},       // .
-	{"0010", 'f'},    // ..-.
-	{"110", 'g'},     // --.
-	{"0000", 'h'},    // ....
-	{"00", 'i'},      // ..
-	{"0111", 'j'},    // .---
-	{"101", 'k'},     // -.-
-	{"0100", 'l'},    // .-..
-	{"11", 'm'},      // --
-	{"10", 'n'},      // -.
-	{"111", 'o'},     // ---
-	{"0110", 'p'},    // .--.
-	{"1101", 'q'},    // --.-
-	{"010", 'e'},     // .-.
-	{"000", 's'},     // ...
-	{"1", 't'},       // -
-	{"001", 'u'},     // ..-
-	{"0001", 'v'},    // ...-
-	{"011", 'w'},     // .--
-	{"1001", 'x'},    // -..-
-	{"1011", 'y'},    // -.--
-	{"1100", 'z'},    // --..
-	{"11111", '0'},   // -----
-	{"01111", '1'},   // .----
-	{"00111", '2'},   // ..---
-	{"00011", '3'},   // ...--
-	{"00001", '4'},   // ....-
-	{"00000", '5'},   // .....
-	{"10000", '6'},   // -....
-	{"11000", '7'},   // --...
-	{"11100", '8'},   // ---..
-	{"11110", '9'}    // ----.
-};
-const unordered_map<string, unsigned> table7 = {
-	{"shell", 505},
-	{"halls", 515},
-	{"slick", 522},
-	{"trick", 532},
-	{"boxes", 535},
-	{"leaks", 542},
-	{"strobe", 545},
-	{"bistro", 552},
-	{"flick", 555},
-	{"bombs", 565},
-	{"break", 572},
-	{"brick", 575},
-	{"steak", 582},
-	{"sting", 592},
-	{"vector", 595},
-	{"beats", 600}
-};
-// 模块8
-const char table8[16] = {
-	'C', 'D', 'C', 'B',
-	'S', 'P', 'D', 'P',
-	'S', 'B', 'C', 'B',
-	'S', 'S', 'P', 'D'
-};
-// 模块9
-const bool table9[3][9][3] = {
-	{ {0,0,1}, {0,1,0}, {1,0,0}, {1,0,1}, {0,1,0}, {1,0,1}, {1,1,1}, {1,1,0}, {0,1,0} },
-	{ {0,1,0}, {1,0,1}, {0,1,0}, {1,0,0}, {0,1,0}, {0,1,1}, {0,0,1}, {1,0,1}, {1,0,0} },
-	{ {1,1,1}, {1,0,1}, {0,1,0}, {1,0,1}, {0,1,0}, {0,1,1}, {1,1,0}, {0,0,1}, {0,0,1} }
-};
-// 模块11
-const array<string, 35> table11 = {
-	"about", "after", "again", "below", "could",
-	"every", "first", "found", "great", "house",
-	"large", "learn", "never", "other", "place",
-	"plant", "point", "right", "small", "sound",
-	"spell", "still", "study", "their", "there",
-	"these", "thing", "think", "three", "water",
-	"where", "which", "world", "would", "write"
-};
-// 模块12
-constexpr array <uint8_t, 4096> make_table12 () {
-	array <uint8_t, 4096> table12;
-	fill(table12.begin(), table12.end(), 0);
-	table12[0x2FD] = 1;
-	table12[0xA9B] = 1;
-	table12[0x67D] = 2;
-	table12[0xA91] = 2;
-	table12[0x0A7] = 3;
-	table12[0x086] = 3;
-	table12[0xBFA] = 4;
-	table12[0xB3A] = 4;
-	return table12;
-}
-constexpr const array <uint8_t, 4096> table12 = make_table12();
-
-
 int main() {
 #ifdef _WIN32 // Win相关设置
 	// 设置标题
 	SetConsoleTitle(TEXT("Bomb Manual Assistant"));
-	// 要求用户启用管理员权限
+
 	if (!IsRunAsAdmin()) {
-		// 请求以管理员权限重新启动
-		if (RestartAsAdmin()) {
-			return 0; // 当前进程退出
-		}
-		else {
-			// 用户拒绝了权限请求
-			return 1;
+		// 启动提示
+		prints('\n', '\n',
+			"此程序仅用于辅助拆弹助手，带有一定作弊性质，请谨慎使用！",
+			"建议第一次使用时先将各个模块的编码方式完整阅读",
+			"祝你好运 ^_^",
+			"Made by Wang125510"
+		);
+		bool ontop = false;
+		print("是否需要将窗口置顶(0表示否，1表示是): ");
+		cin >> ontop;
+		if (ontop) { // 请求以管理员权限重新启动
+			if (RestartAsAdmin()) {
+				return 0; // 当前进程退出
+			}
+			else {
+				// 用户拒绝了权限请求
+				return 1;
+			}
 		}
 	}
-	// 设置置顶
-	if (HWND hwnd = GetConsoleWindow()) {
-		SetWindowPos(hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
+	else {
+		// 设置置顶
+		if (HWND hwnd = GetConsoleWindow()) {
+			SetWindowPos(hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
+		}
 	}
 #endif
 
 	bool odd = 0, aeiou = 0, parallel = 0;
 	unsigned battery = 0, module = 0;
 	unsigned ;
-
-	// 开始提示
-	prints('\n', '\n',
-		"此程序仅用于辅助拆弹助手，带有一定作弊性质，请谨慎使用！",
-		"建议第一次使用时先将各个模块的编码方式完整阅读，部分模块直接对照手册会更快。",
-		"祝你好运 ^_^",
-		"Made by Wang125510"
-	);
 
 restart:
 	system("cls");
@@ -243,68 +103,25 @@ restart:
 			"12.旋钮模块",
 			"13.重新开始"
 		);
+		print("请选择模块: ");
 		cin >> module;
 		switch (module) {
 			case 1: {
 				unsigned counts = 0;
 				print("请输入线的数量: ");
 				cin >> counts;
-				switch (counts) {
-				case 3:
-					prints('\n', '\n',
-						"如果没有红线，则剪断第二根线",
-						"否则，当最后一根线为白线时，剪断最后一根线",
-						"否则，当有不止一根蓝线的时候，剪断最后一根蓝线",
-						"否则，剪断最后一根线"
-					);
-					break;
-				case 4:
-					prints('\n', '\n',
-						"如果有不止一根红线且序列号末位为奇数，则剪断最后一根红线",
-						"否则，当没有红线且最后一根线是黄线时，剪断第一根线",
-						"否则，当有且仅有一根蓝线时，剪断第一根线",
-						"则，当有不止一根黄线时，剪断最后一根线",
-						"则，剪断第二根线"
-					);
-					break;
-				case 5:
-					prints('\n', '\n',
-						"如果最后一根线是黑线且序列号末位为奇数，则剪断第四根线",
-						"否则，当有且仅有一根红线，且黄线不止一根时，剪断第一根线",
-						"否则，当没有黑线时，剪断第二根线",
-						"否则，剪断第一根线"
-					);
-					break;
-				case 6:
-					prints('\n', '\n',
-						"如果没有黄线且序列号末位为奇数，则剪断第三根线",
-						"否则，当有且仅有一根黄线，且白线不止一根时，剪断第四根线",
-						"否则，当没有红线时，剪断最后一根线",
-						"否则，剪断第四根线"
-					);
-					break;
+				while (counts < 3 || counts > 6) {
+					print("线的数量应该在3到6之间，请重新输入: ");
+					cin >> counts;
 				}
+				output1(counts, odd);
 				break;
 			}
 			case 2: { // 按钮模块
-				prints('\n', '\n',
-					"如果是写有“中止”的蓝色按钮，按住按钮",
-					"如果炸弹上有不止1个电池，同时按钮上写着“引爆”，按下按钮并立即松开",
-					"如果按钮是白色的，同时炸弹上有个写着CAR的指示灯亮，按住按钮",
-					"如果炸弹上有不止2个电池，也有写着FRK的指示灯亮，按下按钮并立即松开",
-					"如果按钮是黄色的，按住按钮",
-					"如果是写有“按住”的红色按钮，按下按钮并立即松开",
-					"如果不满足上述任一情况，按住按钮",
-					"",
-					"以下是光条对应的操作:"
-					"蓝色： 在计时器任意数位显示4时松开",
-					"白色： 在计时器任意数位显示1时松开",
-					"黄色： 在计时器任意数位显示5时松开",
-					"其他： 在计时器任意数位显示1时松开"
-				);
+				output2(battery);
 				break;
 			}
-			case 3: { // 键盘模块
+			case 3: { // 键盘模块  未完成
 				printa("由于背诵符号编码很抽象，这个还是自己来更快，加油！");
 				break;
 			}
@@ -312,16 +129,24 @@ restart:
 				unsigned times = 0, temp = 0;
 				print("目前失误了几次: ");
 				cin >> times;
-				printa("接下来输入本次新增的颜色，红绿黄蓝对应1234，输入超过4表示退出");
+				while (times > 2) {
+					print("失误应当最多两次，请重新输入: ");
+					cin >> times;
+				}
+				printa("接下来输入本次新增的颜色，红绿黄蓝对应1234，输入0表示退出");
 				while (true) {
 					print("请输入本次的颜色: ");
 					cin >> temp;
-					if (temp > 4) { break; }
+					while (temp > 4) {
+						print("编码应当在1234中取，请重新输入: ");
+						cin >> temp;
+					}
+					if (temp == 0) { break; }
 					printa(table4[aeiou][times][temp - 1]);
 				}
 				break;
 			}
-			case 5: { // 汉字模块
+			case 5: { // 汉字模块  未完成
 				printa("由于汉字输入过于麻烦，这个还是自己来更快，加油！");
 				break;
 			}
@@ -334,8 +159,7 @@ restart:
 
 				// 第一次
 				print("请输入第一次的情况: ");
-				cin >> code;
-				for (int i = 0; i < 5; i++) { now[i] = code[i] - '0'; }
+				input6(code, now);
 				switch (now[0]) {
 				case 1:
 					ans = 2;
@@ -353,7 +177,7 @@ restart:
 
 				// 第二次
 				print("请输入第二次的情况: ");
-				cin >> code;
+				input6(code, now);
 				for (int i = 0; i < 5; i++) { now[i] = code[i] - '0'; }
 				switch (now[0]) {
 				case 1:
@@ -373,7 +197,7 @@ restart:
 
 				// 第三次
 				print("请输入第三次的情况: ");
-				cin >> code;
+				input6(code, now);
 				for (int i = 0; i < 5; i++) { now[i] = code[i] - '0'; }
 				switch (now[0]) {
 				case 1:
@@ -394,7 +218,7 @@ restart:
 
 				// 第四次
 				print("请输入第四次的情况: ");
-				cin >> code;
+				input6(code, now);
 				for (int i = 0; i < 5; i++) { now[i] = code[i] - '0'; }
 				switch (now[0]) {
 				case 1:
@@ -414,7 +238,7 @@ restart:
 
 				// 第五次
 				print("请输入第五次的情况: ");
-				cin >> code;
+				input6(code, now);
 				for (int i = 0; i < 5; i++) { now[i] = code[i] - '0'; }
 				switch (now[0]) {
 				case 1:
@@ -438,19 +262,29 @@ restart:
 				string code = "", ans = "";
 				printa("请输入摩斯密码，0代表短，1代表长，每次输入一个字母，全部输入完后输入任意非数字完成单词输入: ");
 				while (true) {
+					print("输入: ");
 					cin >> code;
-					if (!std::all_of(code.begin(), code.end(), ::isdigit)) { break; }
-					ans += morse_to_char.find(code)->second;
+					if (!std::all_of(code.begin(), code.end(), ::isdigit)) {
+						break;
+					}
+					auto temp = morse_to_char.find(code);
+					if (temp == morse_to_char.end()) {
+						printa("没有这个摩斯电码");
+						continue;
+					}
+					print("本次输入的是: ", temp->second, '\n');
+					ans += temp->second;
+					print("当前得到的是: ", ans, '\n');
 				}
 				print("你的密码是: ", ans, '\n');
-				auto it = table7.find(ans);
-				if (it == table7.end()) { printa("库里没这个单词"); }
-				else { print("对应的数字是: ", it->second, '\n'); }
+				auto temp = table7.find(ans);
+				if (temp == table7.end()) [[unlikely]] { printa("库里没这个单词"); }
+				else [[likely]] { print("对应的数字是: ", temp->second, '\n'); }
 				break;
 			}
 			case 8: { // 复杂线路
 				string code = "";
-				printa("编码格式为{红色}{蓝色}{符号}{LED}，存在为1，不存在为0，输入'0'表示该模块完成");
+				printa("编码格式为{红色}{蓝色}{符号}{LED}，存在为1，不存在为0，不规范输入表示该模块完成");
 				while (true) {
 					print("请输入编码: ");
 					cin >> code;
@@ -481,42 +315,111 @@ restart:
 				break;
 			}
 			case 9: { // 顺序线路
-				printa("请输入");
 				unsigned active[3] = {0, 0, 0};
 				unsigned choice = 0;
 				string code = "";
+				bool flag = false;
 				while (true) {
 					print("请选择线路(123对应红蓝黑，0表示退出): ");
 					cin >> choice;
+					while (choice > 3) {
+						print("线路应当是123之中一个，请重新输入: ");
+						cin >> choice;
+					}
 					if (choice == 0) { break; }
 					printa("请按照左侧从上倒下的顺序输入当前颜色对应的字母(使用123代替ABC): ");
 					cin >> code;
-					for (char& c : code) {
+					for (const char& c : code) {
+						if (unsigned(c - '1') > 3) {
+							printa("字母应当在123中取，请你重新开始本模块");
+							flag = true;
+							break;
+						}
 						print(table9[choice - 1][active[choice - 1]][c - '1'] ? "剪!" : "不剪!", " ");
 						active[choice - 1]++;
 					}
+					if (flag) { break; }
 					printa("");
 				}
 				break;
 			}
 			case 10: { // 迷宫模块
-				printa("由于图片分析+操作编码太麻烦，这个还是自己来更快，加油！");
+				unsigned temp;
+				unsigned type = 0;
+				printa("其实，任意一个圈的坐标都足以确定迷宫结构");
+				printa("接下来的坐标格式均为{行}{列}，以左上角为11");
+				print("请输入一个圈的坐标: ");
+				cin >> temp;
+				while (true) {
+					if (temp / 10 >= 7 || temp / 10 < 1 || temp % 10 > 6 || temp % 10 == 0) {
+						print("行列均应在1到6之间，请重新输入: ");
+						cin >> temp;
+						continue;
+					}
+					type = table10[temp];
+					if (type == 0) {
+						print("未找到对应的迷宫，请重新输入: ");
+						cin >> temp;
+						continue;
+					}
+					break;
+				}
+				print("该迷宫的类型是: ", type, "，接下来将输出对应的迷宫\n");
+				printa(draw_maze10(type - 1));
+				print("请输入起点坐标: ");
+				cin >> temp;
+				while (temp / 10 >= 7 || temp / 10 < 1 || temp % 10 > 6 || temp % 10 == 0) {
+					print("行列均应在1到6之间，请重新输入: ");
+					cin >> temp;
+				}
+				pair<int, int> start = { static_cast<int>(temp / 10) - 1, static_cast<int>(temp % 10) - 1 };
+				print("请输入终点坐标: ");
+				cin >> temp;
+				while (temp / 10 >= 7 || temp / 10 < 1 || temp % 10 > 6 || temp % 10 == 0) {
+					print("行列均应在1到6之间，请重新输入: ");
+					cin >> temp;
+				}
+				pair<int, int> end = { static_cast<int>(temp / 10) - 1, static_cast<int>(temp % 10) - 1 };
+				printa("计算得到的路径为");
+				printa(draw_maze10(type - 1, solve10(mazes10[type - 1], start, end)));
+#ifdef _DEBUG
+				printa(output_path10(solve10(mazes10[type - 1], start, end)));
+#endif
 				break;
 			}
 			case 11: { // 密码模块
-				string pos1, pos2, pos3, pos4, pos5;
-				printa("请按顺序输入五个位置的可能字母（每个位置6个字母，中间无空格）:");
-				cin >> pos1 >> pos2 >> pos3 >> pos4 >> pos5 ;
-				for (const string& word : table11) {
-					if (pos1.find(word[0]) != string::npos
-						&& pos2.find(word[1]) != string::npos
-						&& pos3.find(word[2]) != string::npos
-						&& pos4.find(word[3]) != string::npos
-						&& pos5.find(word[4]) != string::npos
-					) {
-						print("正确答案是", word, '\n');
-						break;
+				string ch;
+				vector<string> table_temp(35);
+				std::copy(table11.begin(), table11.end(), table_temp.begin());
+				bool flag = false;
+				for (int i = 0; i < 5; i++) {
+					print("请按第", i + 1, "个位置的可能字母（6个小写字母，中间无空格）: ");
+					cin >> ch;
+					while (ch.size() != 6) {
+						print("应当是6个字母，请重新输入: ");
+						cin >> ch;
 					}
+					for (string& word : table_temp) {
+						table_temp.erase(
+							remove_if(
+								table_temp.begin(),
+								table_temp.end(),
+								[&ch, i](const string& w) { return ch.find(w[i]) == string::npos; }
+							),
+							table_temp.end()
+						);
+						if (table_temp.size() == 1) [[likely]] {
+							print("正确答案是: ", table_temp[0], '\n');
+							flag = true;
+							break;
+						}
+						else if (table_temp.empty()) [[unlikely]] {
+							printa("没有符合条件的单词，请检查输入是否正确");
+							flag = true;
+							break;
+						}
+					}
+					if (flag) { break; }
 				}
 				break;
 			}
@@ -545,12 +448,13 @@ restart:
 					printa("右");
 					break;
 				default:
-					printa("非法输入");
+					printa("没有这个排列");
 					break;
 				}
 				break;
 			}
 			case 13:
+				[[unlikely]];
 				goto restart;
 			default: {
 				printa("你输入了错误指令");
@@ -559,6 +463,4 @@ restart:
 		}
 		system("pause");
 	}
-
-	return 0;
 }

@@ -3,5 +3,5 @@
     <Platform Name="x64" />
     <Platform Name="x86" />
   </Configurations>
-  <Project Path="BombManualAssistant.vcxproj" />
+  <Project Path="BombManualAssistant.vcxproj" Id="d1d43af3-acf3-4e95-9829-3b458649b652" />
 </Solution>

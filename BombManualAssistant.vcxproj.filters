@@ -23,6 +23,15 @@
     <ClInclude Include="mytool.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="win.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="maze.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="data.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="readme.md">
