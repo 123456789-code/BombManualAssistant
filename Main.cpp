@@ -32,6 +32,8 @@ using mytool::print, mytool::printa, mytool::prints;
 #endif // DEBUG
 
 int main() {
+	constexpr static const string verson = "1.2.1";
+
 #ifdef _WIN32 // Win相关设置
 	// 设置标题
 	SetConsoleTitle(TEXT("Bomb Manual Assistant"));
