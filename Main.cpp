@@ -24,19 +24,19 @@
 #include "resource.h"
 #endif
 
-using std::cin, std::cout, std::endl, std::string, std::fill, std::bitset, std::pair, std::unordered_map, std::vector, std::remove_if, std::left, std::setw, std::string_view;
+using std::cin, std::cout, std::endl, std::string, std::fill, std::bitset, std::pair, std::unordered_map, std::vector, std::remove_if, std::left, std::setw, std::string_view, std::wstring;
 using mytool::print, mytool::printa, mytool::prints;
 
 #ifdef _DEBUG
 	using mytool::pass;
 #endif // DEBUG
 
-constexpr inline string_view verson = "1.3.4";
+constexpr inline string_view version = "1.3.5";
 
 int main() {
 #ifdef _WIN32 // Win相关设置
 	// 设置标题
-	SetConsoleTitle(TEXT("Bomb Manual Assistant"));
+	SetConsoleTitle((L"Bomb Manual Assistant " + wstring(version.begin(), version.end())).c_str());
 
 	if (!IsRunAsAdmin()) {
 		// 启动提示
