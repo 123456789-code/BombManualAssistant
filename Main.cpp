@@ -14,26 +14,26 @@
 #include <bitset>
 #include <vector>
 #include <algorithm>
+#include "mytool.h"
+#include "data.h"
 
 #ifdef _WIN32
-#include <thread>
 #include <windows.h>
+#include "win.h"
+#include "ImageDisplayWrapper.h"
+#include "resource.h"
 #endif
 
-#include "mytool.h"
-#include "data.h";
-#include "win.h";
-
-using std::cin, std::cout, std::endl, std::string, std::fill, std::bitset, std::pair, std::unordered_map, std::thread, std::vector, std::remove_if, std::left, std::setw;
+using std::cin, std::cout, std::endl, std::string, std::fill, std::bitset, std::pair, std::unordered_map, std::vector, std::remove_if, std::left, std::setw, std::string_view;
 using mytool::print, mytool::printa, mytool::prints;
 
 #ifdef _DEBUG
 	using mytool::pass;
 #endif // DEBUG
 
-int main() {
-	constexpr static const string verson = "1.2.1";
+constexpr inline string_view verson = "1.3.4";
 
+int main() {
 #ifdef _WIN32 // Win相关设置
 	// 设置标题
 	SetConsoleTitle(TEXT("Bomb Manual Assistant"));
@@ -69,7 +69,6 @@ int main() {
 
 	bool odd = 0, aeiou = 0, parallel = 0;
 	unsigned battery = 0, module = 0;
-	unsigned ;
 
 restart:
 	system("cls");
@@ -123,8 +122,25 @@ restart:
 				output2(battery);
 				break;
 			}
-			case 3: { // 键盘模块  未完成
-				printa("由于背诵符号编码很抽象，这个还是自己来更快，加油！");
+			case 3: { // 键盘模块
+#ifdef _WIN32
+				printa("请输入当前键盘上的字符，编码为下表对应数字，顺序请按照正常文字阅读顺序");
+				show_image(IDB_BITMAP1);
+				array<unsigned, 4> code;
+				print("请输入左上角的字符: ");
+				cin >> code[0];
+				print("请输入右上角的字符: ");
+				cin >> code[1];
+				print("请输入左下角的字符: ");
+				cin >> code[2];
+				print("请输入右下角的字符: ");
+				cin >> code[3];
+				array<unsigned, 4> order = sort3(code);
+				output3(order);
+				close_image();
+#else
+				printa("这个模块的代码依赖Windows");
+#endif
 				break;
 			}
 			case 4: { // 四色方块
@@ -144,7 +160,7 @@ restart:
 						cin >> temp;
 					}
 					if (temp == 0) { break; }
-					printa(table4[aeiou][times][temp - 1]);
+					printa(static_cast<int>(table4[!aeiou][times][temp - 1]));
 				}
 				break;
 			}
@@ -154,9 +170,9 @@ restart:
 			}
 			case 6: { // 记忆模块
 				string code = "";
-				unsigned now[5];
+				array<unsigned, 5> now;
 				unsigned ans = 0;
-				pair<unsigned, unsigned> history[4];
+				array<pair<unsigned, unsigned>, 4> history;
 				printa("编码格式为{屏幕数字}{下方四位数字}，请放心，程序会帮你记住的^_^");
 
 				// 第一次
@@ -317,7 +333,7 @@ restart:
 				break;
 			}
 			case 9: { // 顺序线路
-				unsigned active[3] = {0, 0, 0};
+				array<unsigned, 3> active = {0, 0, 0};
 				unsigned choice = 0;
 				string code = "";
 				bool flag = false;

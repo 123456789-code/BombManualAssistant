@@ -127,17 +127,32 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ImageDisplay.cpp" />
     <ClCompile Include="Main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="data.h" />
+    <ClInclude Include="ImageDisplay.h" />
+    <ClInclude Include="ImageDisplayWrapper.h" />
     <ClInclude Include="maze.h" />
     <ClInclude Include="mytool.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="win.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="KeepTalkingAndNobodyExplodes-BombDefusalManual-v1-zh-CN.pdf" />
     <None Include="readme.md" />
+    <None Include="键盘编码.ai" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="键盘模块字符.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="键盘编码.bmp" />
+    <Image Include="键盘编码.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="BombManualAssistant.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

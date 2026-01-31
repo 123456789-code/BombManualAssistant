@@ -5,24 +5,23 @@
 
 using std::string, std::vector, std::pair, std::array, std::to_string;
 
-class Maze6x6 {
+template<int size>
+class Maze {
 private:
-	constexpr static const int size = 6;
-
 	array<array<bool, size>, size - 1> rwall;
 	array<array<bool, size - 1>, size> cwall;
 
 public:
-	constexpr Maze6x6() noexcept : rwall{}, cwall{} {}
-	constexpr Maze6x6(
+	constexpr Maze() noexcept : rwall{}, cwall{} {}
+	constexpr Maze(
 		const array<array<bool, size>, size - 1>& r,
 		const array<array<bool, size - 1>, size>& c
 	) noexcept : rwall(r), cwall(c) {  }
-	constexpr Maze6x6(
+	constexpr Maze(
 		array<array<bool, size>, size - 1>&& r,
 		array<array<bool, size - 1>, size>&& c
 	) noexcept : rwall(r), cwall(c) {  }
-	constexpr ~Maze6x6() noexcept = default;
+	constexpr ~Maze() noexcept = default;
 
 
 	//  «∑Ò ««Ω
@@ -38,5 +37,8 @@ public:
 		case 3:
 			return c == 0 || cwall[r][c - 1];
 		}
+		return true;
 	}
 };
+
+using Maze6x6 = Maze<6>;

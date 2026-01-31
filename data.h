@@ -7,16 +7,17 @@
 #include <cassert>
 #include <functional>
 #include <bitset>
+#include <algorithm>
 #include "mytool.h"
 #include "maze.h"
 
-using std::cin, std::cout, std::endl, std::string, std::array, std::unordered_map, std::left, std::setw, std::function, std::memset, std::bitset;
-using mytool::print, mytool::printa;
+using std::cin, std::cout, std::endl, std::string, std::array, std::unordered_map, std::left, std::setw, std::function, std::memset, std::bitset, std::any_of;
+using mytool::print, mytool::printa, mytool::prints;
 
 // 模块1
-constexpr static const int left1 = 28;
-constexpr static const int right1 = 23;
-static const void output1(const unsigned& counts, const bool& odd) {
+constexpr inline int left1 = 28;
+constexpr inline int right1 = 23;
+inline void output1(const unsigned& counts, const bool& odd) {
 	cout << "╔════════════════════════════════════════════════════════╗" << endl;
 	cout << "║                    线路模块操作指南                    ║" << endl;
 	cout << "╠══════════════════════════════╦═════════════════════════╣" << endl;
@@ -50,7 +51,7 @@ static const void output1(const unsigned& counts, const bool& odd) {
 		if (odd) {
 			cout << "║ " << left << setw(left1) << "黄线 == 0" << " ║ " << setw(right1) << "3" << " ║" << endl;
 		}
-		cout << "║ " << left << setw(left1) << "黄线 == 1" << " ║ " << setw(right1) << "4" << " ║" << endl;
+		cout << "║ " << left << setw(left1) << "黄线 == 1 && 白线 > 1" << " ║ " << setw(right1) << "4" << " ║" << endl;
 		cout << "║ " << left << setw(left1) << "红线 == 0" << " ║ " << setw(right1) << "6" << " ║" << endl;
 		cout << "║ " << left << setw(left1) << "其他" << " ║ " << setw(right1) << "4" << " ║" << endl;
 		break;
@@ -58,9 +59,9 @@ static const void output1(const unsigned& counts, const bool& odd) {
 	cout << "╚══════════════════════════════╩═════════════════════════╝" << endl;
 }
 // 模块2
-constexpr static const int left2 = 24;
-constexpr static const int right2 = 11;
-static const void output2(const unsigned& battery) {
+constexpr inline int left2 = 24;
+constexpr inline int right2 = 11;
+inline void output2(const unsigned& battery) {
 	cout << "╔════════════════════════════════════════╗" << endl;
 	cout << "║            按钮模块操作指南            ║" << endl;
 	cout << "╠══════════════════════════╦═════════════╣" << endl;
@@ -78,14 +79,79 @@ static const void output2(const unsigned& battery) {
 	cout << "║ " << left << setw(left2) << "红色, 按住" << " ║ " << setw(right2) << "按下松开" << " ║" << endl;
 	cout << "║ " << left << setw(left2) << "否则" << " ║ " << setw(right2) << "按住" << " ║" << endl;
 	cout << "╚══════════════════════════╩═════════════╝" << endl;
+	cout << "松开时观察条的颜色，并根据下表操作:" << endl;
+	cout << "╔══════════════════╦═════════════╗" << endl;
+	cout << "║ 颜色             ║ 松开时数字  ║" << endl;
+	cout << "╠══════════════════╬═════════════╣" << endl;
+	cout << "║ 蓝色             ║ 4           ║" << endl;
+	cout << "║ 白色             ║ 1           ║" << endl;
+	cout << "║ 黄色             ║ 5           ║" << endl;
+	cout << "║ 其他颜色         ║ 1           ║" << endl;
+	cout << "╚══════════════════╩═════════════╝" << endl;
+}
+// 模块3
+constexpr inline array<array<uint8_t, 7>, 6> table3{{
+	{ 0,8,9,21,18,22,17 },
+	{ 10,0,17,23,6,22,3 },
+	{ 2,19,23,11,24,9,6 },
+	{ 14,1,15,18,11,3,26 },
+	{ 13,26,15,16,1,7,5 },
+	{ 14,10,25,14,13,20,4 }
+}};
+constexpr array<unsigned, 4> sort3(const array<unsigned, 4>& code) {
+	array<unsigned, 4> order = { 0,0,0,0 };
+	int idx = 0;
+	bool flag = false;
+	for (; idx < 6; idx++) {
+		flag = false;
+		for (const unsigned& c : code) {
+			flag = true;
+			for (const unsigned& l : table3[idx]) {
+				if (c == l) {
+					flag = false;
+					break;
+				}
+			}
+			if (flag) { break; }
+		}
+		if (!flag) { break; }
+	}
+	if (idx == 6) { return order; }
+	int pos = 0;
+	int o = 1;
+	for (const unsigned& l : table3[idx]) {
+		for (int i = 0; i < 4; i++) {
+			if (code[i] == l) {
+				order[i] = o++;
+				break;
+			}
+		}
+		if (o == 5) { break; }
+	}
+	return order;
+}
+void output3(const array<unsigned, 4>& order) {
+	if (any_of(order.begin(), order.end(), [](int x) { return x == 0; })) {
+		printa("没找到相关的顺序，请检查输入");
+	}
+	else {
+		prints('\0', '\n',
+			"按下顺序为:\n",
+			"╔═══╦═══╗\n",
+			"║ ", order[0], " ║ ", order[1], " ║\n",
+			"╠═══╬═══╣\n",
+			"║ ", order[2], " ║ ", order[3], " ║\n",
+			"╚═══╩═══╝"
+		);
+	}
 }
 // 模块4
-constexpr static const unsigned table4[2][3][4]{
-	{ {4,3,2,1}, {1,4,3,2}, {3,2,4,1} },
-	{ {4,1,3,2}, {3,2,4,1}, {2,1,3,4} }
-};
+constexpr inline array<array<array<uint8_t, 4>, 3>, 2> table4{{
+	{{ {4,3,2,1}, {3,4,1,2}, {2,3,4,1} }},
+	{{ {4,2,1,3}, {1,3,2,4}, {3,4,1,2} }}
+}};
 // 模块6
-void input6(string& code, unsigned(&now)[5]) {
+void input6(string& code, array<unsigned, 5>& now) {
 	cin >> code;
 	bool flag = false;
 	while (true) {
@@ -108,7 +174,7 @@ void input6(string& code, unsigned(&now)[5]) {
 	}
 }
 // 模块7
-static const unordered_map<string, char> morse_to_char{
+inline const unordered_map<string, char> morse_to_char{
 	{"01", 'a'},      // .-
 	{"1000", 'b'},    // -...
 	{"1010", 'c'},    // -.-.
@@ -146,7 +212,7 @@ static const unordered_map<string, char> morse_to_char{
 	{"11100", '8'},   // ---..
 	{"11110", '9'}    // ----.
 };
-static const unordered_map<string, unsigned> table7{
+inline const unordered_map<string, unsigned> table7{
 	{"shell", 505},
 	{"halls", 515},
 	{"slick", 522},
@@ -165,20 +231,20 @@ static const unordered_map<string, unsigned> table7{
 	{"beats", 600}
 };
 // 模块8
-constexpr static const char table8[16]{
+constexpr inline array<char, 16> table8{
 	'C', 'D', 'C', 'B',
 	'S', 'P', 'D', 'P',
 	'S', 'B', 'C', 'B',
 	'S', 'S', 'P', 'D'
 };
 // 模块9
-constexpr static const bool table9[3][9][3]{
-	{ {0,0,1}, {0,1,0}, {1,0,0}, {1,0,1}, {0,1,0}, {1,0,1}, {1,1,1}, {1,1,0}, {0,1,0} },
-	{ {0,1,0}, {1,0,1}, {0,1,0}, {1,0,0}, {0,1,0}, {0,1,1}, {0,0,1}, {1,0,1}, {1,0,0} },
-	{ {1,1,1}, {1,0,1}, {0,1,0}, {1,0,1}, {0,1,0}, {0,1,1}, {1,1,0}, {0,0,1}, {0,0,1} }
-};
+constexpr inline array<array<array<bool, 3>, 9>, 3> table9{{
+	{{ {0,0,1}, {0,1,0}, {1,0,0}, {1,0,1}, {0,1,0}, {1,0,1}, {1,1,1}, {1,1,0}, {0,1,0} }},
+	{{ {0,1,0}, {1,0,1}, {0,1,0}, {1,0,0}, {0,1,0}, {0,1,1}, {0,0,1}, {1,0,1}, {1,0,0} }},
+	{{ {1,1,1}, {1,0,1}, {0,1,0}, {1,0,1}, {0,1,0}, {0,1,1}, {1,1,0}, {0,0,1}, {0,0,1} }}
+}};
 // 模块10
-constexpr array <unsigned, 100> make_table10() {
+consteval array<unsigned, 100> make_table10() {
 	array <unsigned, 100> table{};
 	table[21] = 1;
 	table[36] = 1;
@@ -200,29 +266,29 @@ constexpr array <unsigned, 100> make_table10() {
 	table[51] = 9;
 	return table;
 }
-constexpr static const array <unsigned, 100> table10 = make_table10();
-constexpr static const int size = 6;
-constexpr array<array<bool, size>, size - 1> buildr10(std::string_view r) {
-	assert(r.size() == size * size - 2);
-	array<array<bool, size>, size - 1> rwall{};
-	for (int i = 0; i < size - 1; i++) {
-		for (int j = 0; j < size; j++) {
-			rwall[i][j] = (r[i * (size + 1) + j] == '1');
+constexpr inline array<unsigned, 100> table10 = make_table10();
+constexpr inline int size10 = 6;
+consteval array<array<bool, size10>, size10 - 1> buildr10(std::string_view r) {
+	assert(r.size() == size10 * size10 - 2);
+	array<array<bool, size10>, size10 - 1> rwall{};
+	for (int i = 0; i < size10 - 1; i++) {
+		for (int j = 0; j < size10; j++) {
+			rwall[i][j] = (r[i * (size10 + 1) + j] == '1');
 		}
 	}
 	return rwall;
 }
-constexpr array<array<bool, size - 1>, size> buildc10(std::string_view c) {
-	assert(c.size() == size * size - 1);
-	array<array<bool, size - 1>, size> cwall{};
-	for (int i = 0; i < size; i++) {
-		for (int j = 0; j < size - 1; j++) {
-			cwall[i][j] = (c[i * (size - 1 + 1) + j] == '1');
+consteval array<array<bool, size10 - 1>, size10> buildc10(std::string_view c) {
+	assert(c.size() == size10 * size10 - 1);
+	array<array<bool, size10 - 1>, size10> cwall{};
+	for (int i = 0; i < size10; i++) {
+		for (int j = 0; j < size10 - 1; j++) {
+			cwall[i][j] = (c[i * (size10 - 1 + 1) + j] == '1');
 		}
 	}
 	return cwall;
 }
-constexpr array <Maze6x6, 9> make_maze10() {
+consteval array<Maze6x6, 9> make_maze10() {
 	array <Maze6x6, 9> mazes{};
 	mazes[0] = Maze6x6(buildr10("010011 001110 010010 011110 010010"), buildc10("00100 10100 10100 10010 00101 01010"));
 	mazes[1] = Maze6x6(buildr10("101001 010110 001010 010100 000010"), buildc10("00100 01010 10100 01011 11101 10100"));
@@ -235,7 +301,7 @@ constexpr array <Maze6x6, 9> make_maze10() {
 	mazes[8] = Maze6x6(buildr10("001100 000100 011010 000110 000001"), buildc10("10000 11011 00101 11010 11101 01010"));
 	return mazes;
 }
-constexpr static const array <Maze6x6, 9> mazes10 = make_maze10();
+constexpr inline array<Maze6x6, 9> mazes10 = make_maze10();
 vector<pair<int, int>> solve10(const Maze6x6& maze, const pair<int, int>& start, const pair<int, int>& end) {
 	vector<pair<int, int>> path;
 	auto hash = [](const pair<int, int>& p) {
@@ -246,7 +312,7 @@ vector<pair<int, int>> solve10(const Maze6x6& maze, const pair<int, int>& start,
 	const vector<pair<int, int>> directions = { {-1, 0}, {0, 1}, {1, 0}, {0, -1} };
 
 	// 从终点开始DFS
-	vector<vector<bool>> visited(size, vector<bool>(size, false));
+	vector<vector<bool>> visited(size10, vector<bool>(size10, false));
 	function<bool(int, int)> dfs = [&](int r, int c) {
 		if (r == start.first && c == start.second) {
 			path.emplace_back(r, c);
@@ -256,7 +322,7 @@ vector<pair<int, int>> solve10(const Maze6x6& maze, const pair<int, int>& start,
 		for (int dir = 0; dir < 4; dir++) {
 			int nr = r + directions[dir].first;
 			int nc = c + directions[dir].second;
-			if (nr >= 0 && nr < size && nc >= 0 && nc < size && !maze.is_wall(r, c, dir) && !visited[nr][nc]) {
+			if (nr >= 0 && nr < size10 && nc >= 0 && nc < size10 && !maze.is_wall(r, c, dir) && !visited[nr][nc]) {
 				if (dfs(nr, nc)) {
 					path.emplace_back(r, c);
 					return true;
@@ -276,31 +342,31 @@ constexpr string output_path10(const vector<pair<int, int>>& path) {
 	result += "(" + to_string(path.back().first + 1) + ", " + to_string(path.back().second + 1) + ")\n";
 	return result;
 }
-constexpr array<array<bool, 4 * size + 1>, 4 * size + 1> form_maze(unsigned type) {
-	array<array<bool, 4 * size + 1>, 4 * size + 1> wall;
+constexpr array<array<bool, 4 * size10 + 1>, 4 * size10 + 1> form_maze(unsigned type) {
+	array<array<bool, 4 * size10 + 1>, 4 * size10 + 1> wall;
 	// 初始全部设为空格
-	for (int i = 0; i < 4 * size + 1; i++) {
-		for (int j = 0; j < 4 * size + 1; j++) {
+	for (int i = 0; i < 4 * size10 + 1; i++) {
+		for (int j = 0; j < 4 * size10 + 1; j++) {
 			wall[i][j] = 0;
 		}
 	}
 	// 初始化迷宫边界
-	for (int i = 0; i < 4 * size + 1; i++) {
+	for (int i = 0; i < 4 * size10 + 1; i++) {
 		wall[0][i] = true;
-		wall[4 * size][i] = true;
+		wall[4 * size10][i] = true;
 		wall[i][0] = true;
-		wall[i][4 * size] = true;
+		wall[i][4 * size10] = true;
 	}
 	// 设置格点
-	for (int i = 0; i < size; i++) {
-		for (int j = 0; j < size; j++) {
+	for (int i = 0; i < size10; i++) {
+		for (int j = 0; j < size10; j++) {
 			wall[4 * i][4 * j] = true;
 		}
 	}
 	const Maze6x6& maze = mazes10[type];
 	// 设置横墙
-	for (int i = 0; i < size - 1; i++) {
-		for (int j = 0; j < size; j++) {
+	for (int i = 0; i < size10 - 1; i++) {
+		for (int j = 0; j < size10; j++) {
 			if (maze.is_wall(i, j, 2)) {
 				for (int k = 0; k < 4; k++) {
 					wall[4 * (i + 1)][4 * j + 1 + k] = true;
@@ -309,8 +375,8 @@ constexpr array<array<bool, 4 * size + 1>, 4 * size + 1> form_maze(unsigned type
 		}
 	}
 	// 设置竖墙
-	for (int i = 0; i < size; i++) {
-		for (int j = 0; j < size - 1; j++) {
+	for (int i = 0; i < size10; i++) {
+		for (int j = 0; j < size10 - 1; j++) {
 			if (maze.is_wall(i, j, 1)) {
 				for (int k = 0; k < 4; k++) {
 					wall[4 * i + 1 + k][4 * (j + 1)] = true;
@@ -321,10 +387,10 @@ constexpr array<array<bool, 4 * size + 1>, 4 * size + 1> form_maze(unsigned type
 	return wall;
 }
 constexpr string draw_maze10(unsigned type) { // 打印迷宫本身
-	array<array<bool, 4 * size + 1>, 4 * size + 1> wall = form_maze(type);
+	array<array<bool, 4 * size10 + 1>, 4 * size10 + 1> wall = form_maze(type);
 	string maze_str;
-	for (int i = 0; i < 4 * size + 1; i++) {
-		for (int j = 0; j < 4 * size + 1; j++) {
+	for (int i = 0; i < 4 * size10 + 1; i++) {
+		for (int j = 0; j < 4 * size10 + 1; j++) {
 			maze_str += wall[i][j] ? "██" : "  ";
 		}
 		maze_str += '\n';
@@ -332,11 +398,11 @@ constexpr string draw_maze10(unsigned type) { // 打印迷宫本身
 	return maze_str;
 }
 constexpr string draw_maze10(unsigned type, vector<pair<int, int>> path) { // 打印带路径的迷宫
-	array<array<bool, 4 * size + 1>, 4 * size + 1> wall = form_maze(type);
-	array<array<bool, 4 * size + 1>, 4 * size + 1> star;
+	array<array<bool, 4 * size10 + 1>, 4 * size10 + 1> wall = form_maze(type);
+	array<array<bool, 4 * size10 + 1>, 4 * size10 + 1> star;
 	// 初始star
-	for (int i = 0; i < 4 * size + 1; i++) {
-		for (int j = 0; j < 4 * size + 1; j++) {
+	for (int i = 0; i < 4 * size10 + 1; i++) {
+		for (int j = 0; j < 4 * size10 + 1; j++) {
 			star[i][j] = false;
 		}
 	}
@@ -371,8 +437,8 @@ constexpr string draw_maze10(unsigned type, vector<pair<int, int>> path) { // 打
 		}
 	}
 	string maze_str;
-	for (int i = 0; i < 4 * size + 1; i++) {
-		for (int j = 0; j < 4 * size + 1; j++) {
+	for (int i = 0; i < 4 * size10 + 1; i++) {
+		for (int j = 0; j < 4 * size10 + 1; j++) {
 			maze_str += wall[i][j] ? "██" : (star[i][j] ? "▓▓" : "  ");
 		}
 		maze_str += '\n';
